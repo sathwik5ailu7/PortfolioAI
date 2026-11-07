@@ -236,17 +236,21 @@ def get_student_portfolio_draft(current_user: dict = Depends(get_current_user)):
 def save_portfolio_draft(data: PortfolioSaveRequest, current_user: dict = Depends(get_current_user)):
     portfolios_col = db_manager.get_collection("portfolios")
     now = get_utc_now()
+    profile_data = data.profile_data.model_dump()
+    updates = {
+        "username": current_user["username"],
+        "design": data.design.model_dump(),
+        "draft_profile": profile_data,
+        "updated_at": now
+    }
+
+    portfolio = portfolios_col.find_one({"student_id": current_user["_id"]})
+    if portfolio and portfolio.get("is_published", False):
+        updates["published_profile"] = profile_data
     
     portfolios_col.update_one(
         {"student_id": current_user["_id"]},
-        {
-            "$set": {
-                "username": current_user["username"],
-                "design": data.design.model_dump(),
-                "draft_profile": data.profile_data.model_dump(),
-                "updated_at": now
-            }
-        },
+        {"$set": updates},
         upsert=True
     )
     return {"message": "Draft saved successfully.", "updated_at": now}
