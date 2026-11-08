@@ -71,9 +71,15 @@ export default function PortfolioBuilder() {
   const handleTogglePublish = async () => {
     try {
       setPublishing(true);
+      // Auto-save current design and profile draft before publishing so all changes are live
+      await api.post('/portfolio/save-draft', {
+        design: portfolio.design,
+        profile_data: portfolio.profile_data
+      });
       const nextState = !portfolio.is_published;
       const res = await api.post('/portfolio/publish', { is_published: nextState });
       setPortfolio({ ...portfolio, is_published: res.data.is_published });
+      alert(res.data.is_published ? 'Portfolio published live with your latest theme and customizations!' : 'Portfolio unpublished.');
     } catch (err) {
       alert('Failed to update publication status.');
     } finally {

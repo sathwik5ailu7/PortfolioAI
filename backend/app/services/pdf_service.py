@@ -22,7 +22,7 @@ def generate_qr_code_bytes(data_url: str) -> bytes:
     buf.seek(0)
     return buf.getvalue()
 
-def generate_portfolio_pdf(profile_data: Dict[str, Any], public_url: str = "") -> bytes:
+def generate_portfolio_pdf(profile_data: Dict[str, Any], public_url: str = "", design: Dict[str, Any] = None) -> bytes:
     """Generate high-resolution printable Student Portfolio PDF document."""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -35,13 +35,18 @@ def generate_portfolio_pdf(profile_data: Dict[str, Any], public_url: str = "") -
     )
 
     styles = getSampleStyleSheet()
-    
+    design = design or {}
+    pri_hex = design.get("primary_color") or "#4f46e5"
+    if not pri_hex.startswith("#"):
+        pri_hex = "#4f46e5"
+    pri_color = colors.HexColor(pri_hex)
+
     title_style = ParagraphStyle(
         'DocTitle',
         parent=styles['Heading1'],
         fontSize=22,
         leading=26,
-        textColor=colors.HexColor("#312e81"),
+        textColor=pri_color,
         fontName="Helvetica-Bold"
     )
     subtitle_style = ParagraphStyle(
@@ -55,9 +60,9 @@ def generate_portfolio_pdf(profile_data: Dict[str, Any], public_url: str = "") -
     section_heading = ParagraphStyle(
         'SectionHeading',
         parent=styles['Heading2'],
-        fontSize=14,
-        leading=18,
-        textColor=colors.HexColor("#1e1b4b"),
+        fontSize=13,
+        leading=17,
+        textColor=pri_color,
         fontName="Helvetica-Bold",
         spaceBefore=10,
         spaceAfter=4
@@ -102,7 +107,7 @@ def generate_portfolio_pdf(profile_data: Dict[str, Any], public_url: str = "") -
     if public_url: links_list.append(f"Live Portfolio: {public_url}")
     if links_list:
         story.append(Spacer(1, 4))
-        story.append(Paragraph(" • ".join(links_list), ParagraphStyle('Links', parent=body_style, textColor=colors.HexColor("#4f46e5"))))
+        story.append(Paragraph(" • ".join(links_list), ParagraphStyle('Links', parent=body_style, textColor=pri_color)))
 
     story.append(Spacer(1, 8))
     story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#e2e8f0"), spaceBefore=4, spaceAfter=8))
@@ -149,7 +154,7 @@ def generate_portfolio_pdf(profile_data: Dict[str, Any], public_url: str = "") -
             if p.get("github_url"): p_links.append(f"GitHub: {p.get('github_url')}")
             if p.get("live_demo_url"): p_links.append(f"Demo: {p.get('live_demo_url')}")
             if p_links:
-                story.append(Paragraph(" | ".join(p_links), ParagraphStyle('PProjLinks', parent=bullet_style, textColor=colors.HexColor("#4f46e5"))))
+                story.append(Paragraph(" | ".join(p_links), ParagraphStyle('PProjLinks', parent=bullet_style, textColor=pri_color)))
             story.append(Spacer(1, 4))
         story.append(Spacer(1, 4))
 

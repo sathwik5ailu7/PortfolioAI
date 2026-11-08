@@ -126,7 +126,23 @@ export default function PublicPortfolio() {
       <main className="max-w-5xl mx-auto px-6 py-12 space-y-12">
         {/* Hero Section */}
         {d.visible_sections?.hero && (
-          <section className="space-y-6 pt-4">
+          <section
+            className={`space-y-6 pt-4 rounded-3xl p-6 md:p-8 transition-all ${
+              d.template === 'creative'
+                ? 'border-2 shadow-2xl relative overflow-hidden'
+                : d.template === 'professional'
+                ? 'border-b-2 pb-8'
+                : d.template === 'minimal'
+                ? 'border border-slate-200/50'
+                : ''
+            }`}
+            style={{
+              borderColor: d.template === 'creative' ? `${primaryColor}60` : undefined,
+              background: d.template === 'creative'
+                ? `radial-gradient(circle at top right, ${primaryColor}20, transparent 70%)`
+                : undefined
+            }}
+          >
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold" style={{
               backgroundColor: `${primaryColor}15`,
               color: primaryColor
@@ -261,7 +277,24 @@ export default function PublicPortfolio() {
               {p.projects.map((proj, idx) => (
                 <div
                   key={idx}
-                  className={`p-6 rounded-3xl border ${isDark ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700' : 'bg-white border-slate-200 hover:border-slate-300'} flex flex-col justify-between space-y-4 shadow-sm hover:shadow-md transition`}
+                  className={`p-6 rounded-3xl border flex flex-col justify-between space-y-4 shadow-sm hover:shadow-md transition ${
+                    isDark ? 'bg-slate-900/60' : 'bg-white'
+                  } ${
+                    d.template === 'creative'
+                      ? 'shadow-lg hover:scale-[1.02]'
+                      : d.template === 'minimal'
+                      ? 'border-slate-200 shadow-none'
+                      : d.template === 'professional'
+                      ? 'border-l-4'
+                      : ''
+                  }`}
+                  style={{
+                    borderColor: d.template === 'creative'
+                      ? `${primaryColor}40`
+                      : d.template === 'professional'
+                      ? primaryColor
+                      : isDark ? '#1e293b' : '#e2e8f0'
+                  }}
                 >
                   <div className="space-y-3">
                     <h3 className="text-lg font-bold">{proj.title}</h3>

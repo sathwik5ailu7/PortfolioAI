@@ -363,9 +363,10 @@ def download_portfolio_pdf(username: str):
         raise HTTPException(status_code=404, detail="Portfolio not found.")
 
     profile = portfolio.get("published_profile") or portfolio.get("draft_profile") or {}
+    design = portfolio.get("design") or {}
     public_url = f"{settings.FRONTEND_URL}/portfolio/{clean_username}"
     
-    pdf_bytes = generate_portfolio_pdf(profile, public_url=public_url)
+    pdf_bytes = generate_portfolio_pdf(profile, public_url=public_url, design=design)
     filename = f"{clean_username}_portfolio.pdf"
     return Response(
         content=pdf_bytes,
