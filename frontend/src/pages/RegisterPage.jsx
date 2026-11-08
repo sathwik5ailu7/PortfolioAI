@@ -73,7 +73,7 @@ export default function RegisterPage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Sathwik Sharma"
+                  placeholder="Sathwik Goud"
                   className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-900/90 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition text-sm"
                 />
               </div>

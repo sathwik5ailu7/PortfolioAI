@@ -376,15 +376,23 @@ def download_portfolio_pdf(username: str):
 def get_portfolio_qrcode(username: str, request: Request):
     clean_username = username.lower().strip()
     
-    # Check if a custom host was used in the request (e.g. mobile device scanning local IP)
-    host = request.headers.get("host", "")
-    if host and ":" in host:
-        hostname = host.split(":")[0]
-        # If client requested from a local IP (e.g. 192.168.x.x), encode that IP into the QR code
-        if hostname not in ["localhost", "127.0.0.1", "testserver"]:
+    # Priority 1: Use origin or referer header from the frontend caller if present (e.g. https://portfolio-ai-two-green.vercel.app)
+    frontend_origin = request.headers.get("origin") or request.headers.get("referer")
+    if frontend_origin:
+        from urllib.parse import urlparse
+        parsed = urlparse(frontend_origin)
+        base = f"{parsed.scheme}://{parsed.netloc}"
+        public_url = f"{base}/portfolio/{clean_username}"
+    # Priority 2: Use configured FRONTEND_URL if set and not localhost
+    elif settings.FRONTEND_URL and "localhost" not in settings.FRONTEND_URL:
+        public_url = f"{settings.FRONTEND_URL.rstrip('/')}/portfolio/{clean_username}"
+    else:
+        # Priority 3: Local development fallback
+        host = request.headers.get("host", "")
+        hostname = host.split(":")[0] if ":" in host else host
+        if hostname and hostname not in ["localhost", "127.0.0.1", "testserver"]:
             public_url = f"http://{hostname}:5173/portfolio/{clean_username}"
         else:
-            # Attempt to auto-detect local Wi-Fi / LAN IP so scanning phone doesn't fail on localhost
             import socket
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -394,8 +402,6 @@ def get_portfolio_qrcode(username: str, request: Request):
                 public_url = f"http://{local_ip}:5173/portfolio/{clean_username}"
             except Exception:
                 public_url = f"{settings.FRONTEND_URL}/portfolio/{clean_username}"
-    else:
-        public_url = f"{settings.FRONTEND_URL}/portfolio/{clean_username}"
         
     qr_bytes = generate_qr_code_bytes(public_url)
     return Response(content=qr_bytes, media_type="image/png")

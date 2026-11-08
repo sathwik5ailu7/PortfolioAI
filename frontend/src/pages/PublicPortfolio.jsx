@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import api from '../services/api';
+import api, { API_BASE_URL } from '../services/api';
 import { 
   Download, QrCode, Share2, ExternalLink, Globe, Mail, MapPin, Check, FileText, ArrowLeft, RefreshCw 
 } from 'lucide-react';
@@ -110,7 +110,7 @@ export default function PublicPortfolio() {
           </button>
 
           <a
-            href={`/api/portfolio/${username}/pdf`}
+            href={`${API_BASE_URL}/portfolio/${username}/pdf`}
             download
             className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition"
           >
@@ -352,7 +352,7 @@ export default function PublicPortfolio() {
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 text-slate-900 shadow-2xl">
             <h3 className="font-bold text-lg">Scan to Open Portfolio</h3>
             <img
-              src={`/api/portfolio/${username}/qrcode`}
+              src={`${API_BASE_URL}/portfolio/${username}/qrcode`}
               alt="Candidate QR"
               className="w-48 h-48 mx-auto rounded-lg shadow-sm"
             />

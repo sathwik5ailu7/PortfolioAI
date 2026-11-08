@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import api, { API_BASE_URL } from '../services/api';
 import { 
   Palette, Globe, Share2, Eye, Download, QrCode, 
   Check, Copy, Sparkles, ExternalLink, RefreshCw, Layout, Sliders 
@@ -134,7 +134,7 @@ export default function PortfolioBuilder() {
           </button>
 
           <a
-            href={`/api/portfolio/${portfolio.username}/pdf`}
+            href={`${API_BASE_URL}/portfolio/${portfolio.username}/pdf`}
             download
             className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition"
           >
@@ -473,7 +473,7 @@ export default function PortfolioBuilder() {
 
             <div className="flex justify-center p-4 bg-slate-50 rounded-xl border border-slate-200">
               <img
-                src={`/api/portfolio/${portfolio.username}/qrcode`}
+                src={`${API_BASE_URL}/portfolio/${portfolio.username}/qrcode`}
                 alt="Portfolio QR Code"
                 className="w-48 h-48 rounded-lg shadow-sm"
               />
