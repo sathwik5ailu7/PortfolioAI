@@ -135,7 +135,9 @@ export default function PortfolioBuilder() {
 
           <a
             href={`${API_BASE_URL}/portfolio/${portfolio.username}/pdf`}
-            download
+            download={`${portfolio.username}_portfolio.pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition"
           >
             <Download size={14} />

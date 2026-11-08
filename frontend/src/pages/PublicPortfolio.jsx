@@ -111,7 +111,9 @@ export default function PublicPortfolio() {
 
           <a
             href={`${API_BASE_URL}/portfolio/${username}/pdf`}
-            download
+            download={`${username}_portfolio.pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition"
           >
             <Download size={14} />

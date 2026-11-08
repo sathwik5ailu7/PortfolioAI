@@ -366,10 +366,15 @@ def download_portfolio_pdf(username: str):
     public_url = f"{settings.FRONTEND_URL}/portfolio/{clean_username}"
     
     pdf_bytes = generate_portfolio_pdf(profile, public_url=public_url)
+    filename = f"{clean_username}_portfolio.pdf"
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename={clean_username}_portfolio.pdf"}
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Type": "application/pdf",
+            "Access-Control-Expose-Headers": "Content-Disposition",
+        }
     )
 
 @router.get("/portfolio/{username}/qrcode")
@@ -462,10 +467,15 @@ def download_analysis_report_pdf(report_id: str, current_user: dict = Depends(ge
         raise HTTPException(status_code=404, detail="Analysis report not found.")
 
     pdf_bytes = generate_analysis_report_pdf(record["result"], candidate_name=record.get("student_name", "Student"))
+    filename = f"resume_analysis_{report_id[:8]}.pdf"
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename=resume_analysis_{report_id[:8]}.pdf"}
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Type": "application/pdf",
+            "Access-Control-Expose-Headers": "Content-Disposition",
+        }
     )
 
 # ----------------- SKILL GAP ANALYZER -----------------
