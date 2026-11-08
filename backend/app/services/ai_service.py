@@ -33,6 +33,8 @@ class GeminiAIService:
         1. DO NOT invent or fabricate facts. If any field or category is not mentioned in the resume, leave it as an empty string, empty list, or empty object.
         2. In the "missing_fields" list, note any important fields not found (e.g. "phone", "linkedin", "projects", "education").
         3. Return ONLY clean raw JSON without markdown markers or backticks.
+        4. For education "start_year" and "graduation_year": extract the ACTUAL years written in the resume (e.g. "2021" and "2025"). Look for patterns like "2021-2025", "Aug 2021 – May 2025", "2021 to 2025". Do NOT guess or use placeholder years.
+        5. For "cgpa_or_percentage": extract the exact value as written (e.g. "8.5 CGPA", "85%"). Leave empty string if not found.
 
         JSON Schema:
         {{

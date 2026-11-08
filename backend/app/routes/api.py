@@ -193,6 +193,35 @@ async def upload_and_extract_resume(
         "extracted_data": extracted_data
     }
 
+# ----------------- PROFILE PICTURE UPLOAD -----------------
+
+@router.post("/profile/upload-picture")
+async def upload_profile_picture(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload a profile picture (JPEG/PNG/WEBP). Stored as base64 in draft_profile."""
+    allowed_types = {"image/jpeg", "image/jpg", "image/png", "image/webp"}
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Only JPEG, PNG, or WEBP images are supported.")
+
+    content = await file.read()
+    if len(content) > 5 * 1024 * 1024:  # 5MB max
+        raise HTTPException(status_code=400, detail="Profile picture must be under 5MB.")
+
+    import base64
+    b64 = base64.b64encode(content).decode("utf-8")
+    mime = file.content_type
+    data_url = f"data:{mime};base64,{b64}"
+
+    portfolios_col = db_manager.get_collection("portfolios")
+    portfolios_col.update_one(
+        {"student_id": current_user["_id"]},
+        {"$set": {"draft_profile.profile_picture": data_url, "updated_at": get_utc_now()}},
+        upsert=True
+    )
+    return {"message": "Profile picture uploaded successfully.", "profile_picture": data_url}
+
 # ----------------- STUDENT PORTFOLIO BUILDER & PROFILE -----------------
 
 @router.get("/portfolio/draft")

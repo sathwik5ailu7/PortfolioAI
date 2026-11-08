@@ -321,12 +321,25 @@ export default function PortfolioBuilder() {
                   }}>
                     Available for Hiring & Opportunities
                   </span>
-                  <h1 className="text-3xl md:text-5xl font-black tracking-tight">
-                    {p.name || 'Student Candidate'}
-                  </h1>
-                  <p className="text-base md:text-lg font-medium opacity-80" style={{ color: portfolio.design.primary_color }}>
-                    {p.professional_title || 'Software Engineer / Student Builder'}
-                  </p>
+                  {/* Profile pic + name row */}
+                  <div className="flex items-center gap-4">
+                    {p.profile_picture && (
+                      <img
+                        src={p.profile_picture}
+                        alt={p.name || 'Candidate'}
+                        className="w-16 h-16 rounded-xl object-cover shadow-lg shrink-0"
+                        style={{ border: `2px solid ${portfolio.design.primary_color}40` }}
+                      />
+                    )}
+                    <div>
+                      <h1 className="text-3xl md:text-5xl font-black tracking-tight">
+                        {p.name || 'Student Candidate'}
+                      </h1>
+                      <p className="text-base md:text-lg font-medium opacity-80" style={{ color: portfolio.design.primary_color }}>
+                        {p.professional_title || 'Software Engineer / Student Builder'}
+                      </p>
+                    </div>
+                  </div>
                   <p className="text-xs md:text-sm opacity-70 leading-relaxed">
                     {p.location ? `📍 ${p.location} • ` : ''}{p.email || 'student@university.edu'}
                   </p>

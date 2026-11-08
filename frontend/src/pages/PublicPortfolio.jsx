@@ -132,13 +132,27 @@ export default function PublicPortfolio() {
               <span>Verified Student Portfolio • PortfolioAI</span>
             </div>
 
-            <div className="space-y-3">
-              <h1 className="text-4xl md:text-6xl font-black tracking-tight">
-                {p.name || 'Student Candidate'}
-              </h1>
-              <p className="text-xl md:text-2xl font-semibold opacity-90" style={{ color: primaryColor }}>
-                {p.professional_title || 'Software Engineer / Student Builder'}
-              </p>
+            {/* Name + Profile Picture row */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+              {/* Profile Picture */}
+              {p.profile_picture && (
+                <div className="shrink-0">
+                  <img
+                    src={p.profile_picture}
+                    alt={p.name || 'Candidate'}
+                    className="w-28 h-28 md:w-36 md:h-36 rounded-2xl object-cover shadow-xl"
+                    style={{ border: `3px solid ${primaryColor}40` }}
+                  />
+                </div>
+              )}
+              <div className="space-y-3">
+                <h1 className="text-4xl md:text-6xl font-black tracking-tight">
+                  {p.name || 'Student Candidate'}
+                </h1>
+                <p className="text-xl md:text-2xl font-semibold opacity-90" style={{ color: primaryColor }}>
+                  {p.professional_title || 'Software Engineer / Student Builder'}
+                </p>
+              </div>
             </div>
 
             {/* Meta info */}

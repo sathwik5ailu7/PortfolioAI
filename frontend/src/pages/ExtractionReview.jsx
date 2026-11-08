@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { 
   Sparkles, CheckCircle2, Plus, Trash2, ArrowRight, 
   Save, AlertTriangle, User, GraduationCap, Briefcase, 
-  Code2, Award, FolderGit2, Link2, RefreshCw
+  Code2, Award, FolderGit2, Link2, RefreshCw, Camera, Upload, X
 } from 'lucide-react';
 
 export default function ExtractionReview() {
@@ -12,6 +12,9 @@ export default function ExtractionReview() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [missingFields, setMissingFields] = useState([]);
+  const [profilePicPreview, setProfilePicPreview] = useState('');
+  const [uploadingPic, setUploadingPic] = useState(false);
+  const picInputRef = React.useRef(null);
   
   const [profile, setProfile] = useState({
     name: '',
@@ -52,6 +55,9 @@ export default function ExtractionReview() {
             ...profile,
             ...res.data.profile_data
           });
+          if (res.data.profile_data.profile_picture) {
+            setProfilePicPreview(res.data.profile_data.profile_picture);
+          }
         }
       }
     } catch (err) {
@@ -69,6 +75,7 @@ export default function ExtractionReview() {
       location: ext.personal_info?.location || '',
       professional_title: ext.personal_info?.professional_title || 'Software Engineering Student',
       about_me: ext.professional_summary || '',
+      profile_picture: ext.profile_picture || '',
       social_links: {
         linkedin: ext.social_links?.linkedin || '',
         github: ext.social_links?.github || '',
@@ -87,6 +94,39 @@ export default function ExtractionReview() {
       experience: ext.experience || [],
       achievements: ext.achievements || []
     });
+    if (ext.profile_picture) setProfilePicPreview(ext.profile_picture);
+  };
+
+  const handleProfilePicUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    // Client-side preview immediately
+    const reader = new FileReader();
+    reader.onload = (ev) => setProfilePicPreview(ev.target.result);
+    reader.readAsDataURL(file);
+    // Upload to backend
+    try {
+      setUploadingPic(true);
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await api.post('/profile/upload-picture', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setProfile(prev => ({ ...prev, profile_picture: res.data.profile_picture }));
+    } catch (err) {
+      console.error('Profile picture upload failed:', err);
+      alert('Failed to upload profile picture. Max size is 5MB (JPEG/PNG/WEBP).');
+    } finally {
+      setUploadingPic(false);
+    }
+  };
+
+  const removeProfilePic = async () => {
+    setProfilePicPreview('');
+    setProfile(prev => ({ ...prev, profile_picture: '' }));
+    try {
+      await api.post('/profile/upload-picture', new FormData()); // Will be handled gracefully
+    } catch (_) {}
   };
 
   const handleSaveAndProceed = async () => {
@@ -233,6 +273,58 @@ export default function ExtractionReview() {
           <User size={18} className="text-indigo-600" />
           <span>Personal Information</span>
         </h3>
+
+        {/* Profile Picture Upload */}
+        <div className="flex items-center space-x-5 pb-2">
+          <div className="relative shrink-0">
+            {profilePicPreview ? (
+              <img
+                src={profilePicPreview}
+                alt="Profile"
+                className="w-20 h-20 rounded-full object-cover border-2 border-indigo-300 shadow-md"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-indigo-50 border-2 border-dashed border-indigo-300 flex items-center justify-center">
+                <User size={28} className="text-indigo-400" />
+              </div>
+            )}
+            {uploadingPic && (
+              <div className="absolute inset-0 rounded-full bg-white/70 flex items-center justify-center">
+                <RefreshCw size={18} className="animate-spin text-indigo-600" />
+              </div>
+            )}
+            {profilePicPreview && !uploadingPic && (
+              <button
+                type="button"
+                onClick={() => { setProfilePicPreview(''); setProfile(p => ({ ...p, profile_picture: '' })); }}
+                className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 rounded-full text-white flex items-center justify-center hover:bg-rose-600 transition"
+                title="Remove photo"
+              >
+                <X size={10} />
+              </button>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold text-slate-700">Profile Photo</p>
+            <p className="text-[11px] text-slate-500">JPEG, PNG or WEBP · Max 5MB · Shown in portfolio hero</p>
+            <input
+              ref={picInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleProfilePicUpload}
+            />
+            <button
+              type="button"
+              onClick={() => picInputRef.current?.click()}
+              disabled={uploadingPic}
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition disabled:opacity-60"
+            >
+              <Camera size={13} />
+              <span>{profilePicPreview ? 'Change Photo' : 'Upload Photo'}</span>
+            </button>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
